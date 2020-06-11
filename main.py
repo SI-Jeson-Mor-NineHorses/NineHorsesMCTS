@@ -1,3 +1,6 @@
+import queue
+import threading
+
 import pygame
 import sys
 from GUI.board_gui import *
@@ -119,6 +122,13 @@ def run_game(mode, number_of_simulations):
     current_move = ''
     run_flag = 0
 
+    #=====================================
+    # Threading things
+    is_simulation_running = False
+    t1, t2 = None, None
+    q1, q2 = queue.Queue(), queue.Queue()
+    # =====================================
+
     screen.blit(bg, (0, 0))
     all_sprites_list.draw(screen)
     pygame.display.update()
@@ -184,36 +194,50 @@ def run_game(mode, number_of_simulations):
                             # board.highlight_optional_moves(player_moves)
                             pygame.time.wait(1000)
             elif mode == 2:
+                pygame.event.get()
                 board_mcts = Board(board=simplify_board(board.array))
                 board_state = GameState(state=board_mcts, next_to_move=1)
                 root = MonteCarloTreeSearchNode(state=board_state, parent=None)
                 mcts = MonteCarloTreeSearch(root)
-                best_node = mcts.best_action(number_of_simulations)
-                c_state = best_node.state
-                c_board = c_state.board
 
-                x_from = c_state.current_move.pos_from.getX()
-                y_from = c_state.current_move.pos_from.getY()
-                # print("x_from", x_from)
-                # print("y_from", y_from)
+                if not is_simulation_running:
+                    t1 = threading.Thread(target=mcts.best_action, args=(number_of_simulations, q1))
+                    t1.daemon = True
+                    t1.start()
+                    is_simulation_running = True
+                    # best_node = mcts.best_action(number_of_simulations)
+                else:
+                    if not q1.empty():
+                        best_node = q1.get()
+                        # t1.join()
+                        q1.queue.clear()
+                        is_simulation_running = False
 
-                x_to = c_state.current_move.pos_to.getX()
-                y_to = c_state.current_move.pos_to.getY()
-                # print("x_to", x_to)
-                # print("y_to", y_to)
+                        c_state = best_node.state
+                        c_board = c_state.board
+
+                        x_from = c_state.current_move.pos_from.getX()
+                        y_from = c_state.current_move.pos_from.getY()
+                        # print("x_from", x_from)
+                        # print("y_from", y_from)
+
+                        x_to = c_state.current_move.pos_to.getX()
+                        y_to = c_state.current_move.pos_to.getY()
+                        # print("x_to", x_to)
+                        # print("y_to", y_to)
 
 
 
-                piece = select_piece_xy("w", x_from, y_from)
-                square = (x_to, y_to)
-                dest = board.array[y_to][x_to]
+                        piece = select_piece_xy("w", x_from, y_from)
+                        square = (x_to, y_to)
+                        dest = board.array[y_to][x_to]
 
-                board.move_piece(piece, y_to, x_to)  # wykonanie ruchu
-                if dest:
-                    sprites = reload_sprites()
-                    all_sprites_list.empty()
-                    all_sprites_list.add(reload_sprites())
-                player = 2
+                        board.move_piece(piece, y_to, x_to)  # wykonanie ruchu
+                        if dest:
+                            sprites = reload_sprites()
+                            all_sprites_list.empty()
+                            all_sprites_list.add(reload_sprites())
+                        player = 2
 
         # drugi gracz
         elif player == 2:
@@ -266,35 +290,48 @@ def run_game(mode, number_of_simulations):
                             pygame.time.wait(1000)
 
             elif mode == 1 or mode == 2:
+                pygame.event.get()
                 board_mcts = Board(board=simplify_board(board.array))
-                print(board_mcts.boardValues)
+                # print(board_mcts.boardValues)
                 board_state = GameState(state=board_mcts, next_to_move=-1)
                 root = MonteCarloTreeSearchNode(state=board_state, parent=None)
                 mcts = MonteCarloTreeSearch(root)
-                best_node = mcts.best_action(number_of_simulations)
-                c_state = best_node.state
-                c_board = c_state.board
+                if not is_simulation_running:
+                    t2 = threading.Thread(target=mcts.best_action, args=(number_of_simulations, q2))
+                    t2.daemon = True
+                    t2.start()
+                    is_simulation_running = True
+                    # best_node = mcts.best_action(number_of_simulations)
+                else:
+                    if not q2.empty():
+                        best_node = q2.get()
+                        # t2.join()
+                        q2.queue.clear()
+                        is_simulation_running = False
 
-                x_from = c_state.current_move.pos_from.getX()
-                y_from = c_state.current_move.pos_from.getY()
-                # print("x_from", x_from)
-                # print("y_from", y_from)
+                        c_state = best_node.state
+                        c_board = c_state.board
 
-                x_to = c_state.current_move.pos_to.getX()
-                y_to = c_state.current_move.pos_to.getY()
-                # print("x_to", x_to)
-                # print("y_to", y_to)
+                        x_from = c_state.current_move.pos_from.getX()
+                        y_from = c_state.current_move.pos_from.getY()
+                        # print("x_from", x_from)
+                        # print("y_from", y_from)
 
-                piece = select_piece_xy("b", x_from, y_from)
-                square = (x_to, y_to)
-                dest = board.array[y_to][x_to]
+                        x_to = c_state.current_move.pos_to.getX()
+                        y_to = c_state.current_move.pos_to.getY()
+                        # print("x_to", x_to)
+                        # print("y_to", y_to)
 
-                board.move_piece(piece, y_to, x_to)  # wykonanie ruchu
-                if dest:
-                    sprites = reload_sprites()
-                    all_sprites_list.empty()
-                    all_sprites_list.add(reload_sprites())
-                player = 1
+                        piece = select_piece_xy("b", x_from, y_from)
+                        square = (x_to, y_to)
+                        dest = board.array[y_to][x_to]
+
+                        board.move_piece(piece, y_to, x_to)  # wykonanie ruchu
+                        if dest:
+                            sprites = reload_sprites()
+                            all_sprites_list.empty()
+                            all_sprites_list.add(reload_sprites())
+                        player = 1
 
         screen.blit(bg, (0, 0))
         all_sprites_list.draw(screen)
