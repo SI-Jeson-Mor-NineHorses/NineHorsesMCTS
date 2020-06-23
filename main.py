@@ -194,7 +194,13 @@ def run_game(mode, number_of_simulations):
                             # board.highlight_optional_moves(player_moves)
                             pygame.time.wait(1000)
             elif mode == 2:
-                pygame.event.get()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit()
+
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            gameover = True
                 board_mcts = Board(board=simplify_board(board.array))
                 board_state = GameState(state=board_mcts, next_to_move=1)
                 root = MonteCarloTreeSearchNode(state=board_state, parent=None)
@@ -290,7 +296,13 @@ def run_game(mode, number_of_simulations):
                             pygame.time.wait(1000)
 
             elif mode == 1 or mode == 2:
-                pygame.event.get()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit()
+
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            gameover = True
                 board_mcts = Board(board=simplify_board(board.array))
                 # print(board_mcts.boardValues)
                 board_state = GameState(state=board_mcts, next_to_move=-1)
