@@ -134,3 +134,4 @@ dmypy.json
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/dbnavigator.xml
 .idea/codeStyles/Project.xml
+output/NineHorsesMCTS.exe

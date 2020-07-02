@@ -1,6 +1,6 @@
 import queue
 import threading
-
+import os
 import pygame
 import sys
 from GUI.board_gui import *
@@ -14,6 +14,16 @@ import pygame_textinput
 import re
 import time
 
+
+def resource_path(relative_path):
+    default = "assets/"
+    relative_path = default + relative_path
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 pygame.init()
 pygame.font.init()
 
@@ -23,20 +33,20 @@ pygame.display.set_caption('Python Jeson Mor Game')
 clock = pygame.time.Clock()  # odświeżanie okna
 
 #MENU
-menu_image = pygame.image.load("./assets/gui/home-screen.png")
-button_image = pygame.image.load("./assets/gui/button.png")
-button_image_small = pygame.image.load("./assets/gui/small-button.png")
-settings_image = pygame.image.load("./assets/gui/settings.png")
-mode_image = pygame.image.load("./assets/gui/mode.png")
+menu_image = pygame.image.load(resource_path("gui/home-screen.png"))
+button_image = pygame.image.load(resource_path("gui/button.png"))
+button_image_small = pygame.image.load(resource_path("gui/small-button.png"))
+settings_image = pygame.image.load(resource_path("gui/settings.png"))
+mode_image = pygame.image.load(resource_path("gui/mode.png"))
 
-winner_white = pygame.image.load("./assets/gui/white_winner.png")
-winner_black = pygame.image.load("./assets/gui/black_winner.png")
+winner_white = pygame.image.load(resource_path("gui/white_winner.png"))
+winner_black = pygame.image.load(resource_path("gui/black_winner.png"))
 
 #MENU TEXT
 text_color = (124, 73, 0)
 highlight_color = (140, 97, 72)
-menu_font = pygame.font.Font("./assets/gui/GROBOLD.ttf", 20)
-menu_font_small = pygame.font.Font("./assets/gui/GROBOLD.ttf", 15)
+menu_font = pygame.font.Font(resource_path("gui/GROBOLD.ttf"), 20)
+menu_font_small = pygame.font.Font(resource_path("gui/GROBOLD.ttf"), 15)
 
 start_game_text = menu_font.render("Start game", True, text_color)
 settings_text = menu_font.render("Settings", True, text_color)
@@ -49,10 +59,10 @@ player_vs_ai_text = menu_font.render("Player vs AI", True, text_color)
 ai_vs_ai_text = menu_font.render("AI vs AI", True, text_color)
 
 
-textinput_font = pygame.font.Font("./assets/gui/GROBOLD.ttf", 22)
+textinput_font = pygame.font.Font(resource_path("gui/GROBOLD.ttf"), 22)
 
 # Załadowanie wygenerowanej planszy
-bg = pygame.image.load("./assets/board.png").convert()
+bg = pygame.image.load(resource_path("board.png")).convert()
 player = 1
 board = BoardGUI()
 
@@ -396,169 +406,168 @@ def printBoard(boardValues):
         print(arr)
 
 
-
-
 if __name__ == "__main__":
-#    run_game(1, 1000)
     number_of_simulations = 1000
     menu = True
-    while True:
-        while menu:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = event.pos
-                    print(x, y)
-                    if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
-                        print("start game")
-                        mode = True
-                        while mode:
-                            events = pygame.event.get()
-                            for event in events:
-                                if event.type == pygame.MOUSEBUTTONDOWN:
-                                    x, y = event.pos
-
-                                    if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
-                                        mode = False
-                                        run_game(0, number_of_simulations)
-                                    elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
-                                        mode = False
-                                        run_game(1, number_of_simulations)
-                                    elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
-                                        mode = False
-                                        run_game(2, number_of_simulations)
-                                    elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
-                                        mode = False
-
-                                elif event.type == pygame.KEYDOWN:
-                                    if event.key == pygame.K_ESCAPE:
-                                        mode = False
-
-                                elif event.type == pygame.QUIT:
-                                    pygame.quit()
-                                    quit()
-
-                            x, y = pygame.mouse.get_pos()
-                            if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
-                                player_vs_player_text = menu_font.render("Player vs Player", True, highlight_color)
-                            elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
-                                player_vs_ai_text = menu_font.render("Player vs AI", True, highlight_color)
-                            elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
-                                ai_vs_ai_text = menu_font.render("AI vs AI", True, highlight_color)
-                            elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
-                                back_text = menu_font_small.render("Back", True, highlight_color)
-                            else:
-                                player_vs_player_text = menu_font.render("Player vs Player", True, text_color)
-                                player_vs_ai_text = menu_font.render("Player vs AI", True, text_color)
-                                ai_vs_ai_text = menu_font.render("AI vs AI", True, text_color)
-                                back_text = menu_font_small.render("Back", True, text_color)
-
-                            screen.blit(mode_image, (0, 0))
-                            screen.blit(button_image, (164, 140))
-                            screen.blit(player_vs_player_text, (195, 150))
-
-                            screen.blit(button_image, (164, 210))
-                            screen.blit(player_vs_ai_text, (210, 220))
-
-                            screen.blit(button_image, (164, 280))
-                            screen.blit(ai_vs_ai_text, (230, 290))
-
-                            screen.blit(button_image_small, (450, 500))
-                            screen.blit(back_text, (470, 505))
-
-                            pygame.display.flip()
-                            pygame.display.update()
-
-                    elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
-                        print("settings")
-                        settings = True
-                        textinput = pygame_textinput.TextInput(initial_string=str(number_of_simulations),
-                                                               font_family="./assets/gui/GROBOLD.ttf", font_size=22,
-                                                               text_color=(124, 73, 0), max_string_length=10)
-                        while settings:
-                            events = pygame.event.get()
-                            textinput.update(events)
-                            for event in events:
-                                if event.type == pygame.MOUSEBUTTONDOWN:
-                                    x, y = event.pos
-                                    if button_image.get_rect(topleft=(164, 250)).collidepoint(x, y):
-                                        pattern = re.compile("\d{1,10}$")
-                                        if pattern.match(textinput.get_text()):
-                                            textinput.set_text_color((0, 255, 0))
-                                            number_of_simulations = int(textinput.get_text())
-                                        else:
-                                            textinput.set_text_color((255, 0, 0))
-                                    elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
-                                        settings = False
-
-                                elif event.type == pygame.KEYDOWN:
-                                    if event.key == pygame.K_ESCAPE:
-                                        settings = False
-
-                                elif event.type == pygame.QUIT:
-                                    pygame.quit()
-                                    quit()
-
-                            try:
-                                if number_of_simulations != int(textinput.get_text()):
-                                    textinput.set_text_color((124, 73, 0))
-                            except:
-                                pass
-
-                            x, y = pygame.mouse.get_pos()
-                            if button_image.get_rect(topleft=(164, 250)).collidepoint(x, y):
-                                accept_text = menu_font.render("Accept", True, highlight_color)
-                            elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
-                                back_text = menu_font_small.render("Back", True, highlight_color)
-                            else:
-                                accept_text = menu_font.render("Accept", True, text_color)
-                                back_text = menu_font_small.render("Back", True, text_color)
-
-
-                            input_text_size = textinput_font.size(textinput.get_text())
-
-                            screen.blit(settings_image, (0, 0))
-                            screen.blit(button_image, (164, 250))
-                            screen.blit(accept_text, (230, 260))
-                            screen.blit(button_image_small, (450, 500))
-                            screen.blit(back_text, (470, 505))
-                            screen.blit(textinput.get_surface(), (270 - int(input_text_size[0]/2), 167))
-                            pygame.display.flip()
-                            pygame.display.update()
-
-
-                    elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
-                        print("exit")
+    try:
+        while True:
+            while menu:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
                         pygame.quit()
                         quit()
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        x, y = event.pos
+                        print(x, y)
+                        if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
+                            print("start game")
+                            mode = True
+                            while mode:
+                                events = pygame.event.get()
+                                for event in events:
+                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                        x, y = event.pos
 
-            #Highlight menu text
-            x, y = pygame.mouse.get_pos()
-            if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
-                start_game_text = menu_font.render("Start game", True, highlight_color)
-            elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
-                settings_text = menu_font.render("Settings", True, highlight_color)
-            elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
-                quit_text = menu_font.render("Quit", True, highlight_color)
-            else:
-                start_game_text = menu_font.render("Start game", True, text_color)
-                settings_text = menu_font.render("Settings", True, text_color)
-                quit_text = menu_font.render("Quit", True, text_color)
+                                        if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
+                                            mode = False
+                                            run_game(0, number_of_simulations)
+                                        elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
+                                            mode = False
+                                            run_game(1, number_of_simulations)
+                                        elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
+                                            mode = False
+                                            run_game(2, number_of_simulations)
+                                        elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
+                                            mode = False
 
-            #Display menu
-            screen.blit(menu_image, (0, 0))
+                                    elif event.type == pygame.KEYDOWN:
+                                        if event.key == pygame.K_ESCAPE:
+                                            mode = False
 
-            screen.blit(button_image, (164, 140))
-            screen.blit(start_game_text, (215, 150))
+                                    elif event.type == pygame.QUIT:
+                                        pygame.quit()
+                                        quit()
 
-            screen.blit(button_image, (164, 210))
-            screen.blit(settings_text, (230, 220))
+                                x, y = pygame.mouse.get_pos()
+                                if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
+                                    player_vs_player_text = menu_font.render("Player vs Player", True, highlight_color)
+                                elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
+                                    player_vs_ai_text = menu_font.render("Player vs AI", True, highlight_color)
+                                elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
+                                    ai_vs_ai_text = menu_font.render("AI vs AI", True, highlight_color)
+                                elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
+                                    back_text = menu_font_small.render("Back", True, highlight_color)
+                                else:
+                                    player_vs_player_text = menu_font.render("Player vs Player", True, text_color)
+                                    player_vs_ai_text = menu_font.render("Player vs AI", True, text_color)
+                                    ai_vs_ai_text = menu_font.render("AI vs AI", True, text_color)
+                                    back_text = menu_font_small.render("Back", True, text_color)
 
-            screen.blit(button_image, (164, 280))
-            screen.blit(quit_text, (245, 290))
+                                screen.blit(mode_image, (0, 0))
+                                screen.blit(button_image, (164, 140))
+                                screen.blit(player_vs_player_text, (195, 150))
 
-            pygame.display.flip()
-            clock.tick(60)
-            pygame.display.update()
+                                screen.blit(button_image, (164, 210))
+                                screen.blit(player_vs_ai_text, (210, 220))
+
+                                screen.blit(button_image, (164, 280))
+                                screen.blit(ai_vs_ai_text, (230, 290))
+
+                                screen.blit(button_image_small, (450, 500))
+                                screen.blit(back_text, (470, 505))
+
+                                pygame.display.flip()
+                                pygame.display.update()
+
+                        elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
+                            print("settings")
+                            settings = True
+                            textinput = pygame_textinput.TextInput(initial_string=str(number_of_simulations),
+                                                                   font_family=resource_path("gui/GROBOLD.ttf"), font_size=22,
+                                                                   text_color=(124, 73, 0), max_string_length=10)
+                            while settings:
+                                events = pygame.event.get()
+                                textinput.update(events)
+                                for event in events:
+                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                        x, y = event.pos
+                                        if button_image.get_rect(topleft=(164, 250)).collidepoint(x, y):
+                                            pattern = re.compile("\d{1,10}$")
+                                            if pattern.match(textinput.get_text()):
+                                                textinput.set_text_color((0, 255, 0))
+                                                number_of_simulations = int(textinput.get_text())
+                                            else:
+                                                textinput.set_text_color((255, 0, 0))
+                                        elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
+                                            settings = False
+
+                                    elif event.type == pygame.KEYDOWN:
+                                        if event.key == pygame.K_ESCAPE:
+                                            settings = False
+
+                                    elif event.type == pygame.QUIT:
+                                        pygame.quit()
+                                        quit()
+
+                                try:
+                                    if number_of_simulations != int(textinput.get_text()):
+                                        textinput.set_text_color((124, 73, 0))
+                                except:
+                                    pass
+
+                                x, y = pygame.mouse.get_pos()
+                                if button_image.get_rect(topleft=(164, 250)).collidepoint(x, y):
+                                    accept_text = menu_font.render("Accept", True, highlight_color)
+                                elif button_image_small.get_rect(topleft=(450, 500)).collidepoint(x, y):
+                                    back_text = menu_font_small.render("Back", True, highlight_color)
+                                else:
+                                    accept_text = menu_font.render("Accept", True, text_color)
+                                    back_text = menu_font_small.render("Back", True, text_color)
+
+
+                                input_text_size = textinput_font.size(textinput.get_text())
+
+                                screen.blit(settings_image, (0, 0))
+                                screen.blit(button_image, (164, 250))
+                                screen.blit(accept_text, (230, 260))
+                                screen.blit(button_image_small, (450, 500))
+                                screen.blit(back_text, (470, 505))
+                                screen.blit(textinput.get_surface(), (270 - int(input_text_size[0]/2), 167))
+                                pygame.display.flip()
+                                pygame.display.update()
+
+                        elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
+                            print("exit")
+                            raise Exception
+
+                #Highlight menu text
+                x, y = pygame.mouse.get_pos()
+                if button_image.get_rect(topleft=(164, 140)).collidepoint(x, y):
+                    start_game_text = menu_font.render("Start game", True, highlight_color)
+                elif button_image.get_rect(topleft=(164, 210)).collidepoint(x, y):
+                    settings_text = menu_font.render("Settings", True, highlight_color)
+                elif button_image.get_rect(topleft=(164, 280)).collidepoint(x, y):
+                    quit_text = menu_font.render("Quit", True, highlight_color)
+                else:
+                    start_game_text = menu_font.render("Start game", True, text_color)
+                    settings_text = menu_font.render("Settings", True, text_color)
+                    quit_text = menu_font.render("Quit", True, text_color)
+
+                #Display menu
+                screen.blit(menu_image, (0, 0))
+
+                screen.blit(button_image, (164, 140))
+                screen.blit(start_game_text, (215, 150))
+
+                screen.blit(button_image, (164, 210))
+                screen.blit(settings_text, (230, 220))
+
+                screen.blit(button_image, (164, 280))
+                screen.blit(quit_text, (245, 290))
+
+                pygame.display.flip()
+                clock.tick(60)
+                pygame.display.update()
+    except Exception:
+        pygame.quit()
+        sys.exit()

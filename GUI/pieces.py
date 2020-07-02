@@ -1,4 +1,6 @@
 import pygame
+import os
+import sys
 
 # def capture_check(your_color, y, x, board):
 #     piece = board.array[y][x]
@@ -11,6 +13,18 @@ import pygame
 #             return False
 
 # Sprawdza czy wykonanie ruchu jest możliwe
+
+
+def resource_path(relative_path):
+    default = "assets/"
+    relative_path = default + relative_path
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
 def move_check(your_color, y, x, board):
     if x < 0 or x > 8 or y < 0 or y > 8:
         return False
@@ -60,7 +74,7 @@ class Knight(Piece):
     def __init__(self, color, y, x):
         super().__init__(color,(255, 0, 0), y, x)
         self.sprite = pygame.image.load(
-            "./assets/{}knight.png".format(self.color))
+            resource_path("{}knight.png".format(self.color)))
         self.symbol = "N"
         self.image.blit(self.sprite, (0, 0))
 
@@ -83,7 +97,7 @@ class Empty(Piece):
     def __init__(self, color,  y, x):
         super().__init__(color, (0, 200, 0), y, x)
         self.sprite = pygame.image.load(
-            "./assets/{}knight.png".format(self.color))
+            resource_path("{}knight.png".format(self.color)))
         self.symbol = "N"
         self.image.blit(self.sprite, (0, 0))
 
